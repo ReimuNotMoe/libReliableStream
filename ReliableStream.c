@@ -40,3 +40,25 @@ void rrs_init_ctx(struct rrs_ctx *ctx, struct rrs_params *params) {
 #endif
 
 }
+
+void rrs_free_ctx(struct rrs_ctx *ctx) {
+	memset(ctx->Buffers.LastReceivedPacket, 0, ctx->Params.LengthMax_Packet);
+	memset(ctx->Buffers.LastEncodedPacket, 0, ctx->Params.LengthMax_Packet);
+
+	free(ctx->Buffers.LastEncodedPacket);
+	free(ctx->Buffers.LastReceivedPacket);
+
+	memset(ctx, 0, sizeof(struct rrs_ctx));
+}
+
+uint32_t rrs_u16_combine(uint16_t v0, uint16_t v1) {
+	uint32_t ret;
+	((uint16_t *)(&ret))[0] = v0;
+	((uint16_t *)(&ret))[1] = v1;
+
+	return ret;
+}
+
+uint16_t rrs_u16_slice(uint32_t combined, int what) {
+	return ((uint16_t *)(&combined))[what];
+}

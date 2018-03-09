@@ -58,9 +58,11 @@ struct rrs_params {
 	uint16_t LengthMax_Data;
 	uint16_t LengthMax_Packet;
 
+	// All timeouts are in ms (milliseconds)
 	size_t Timeout_IO_Read;
 	size_t Timeout_IO_Blackhole; // Discard incoming data for some time within this interval
 	size_t Timeout_IO_Resend;
+	int Timeout_IO_PipeThread; // -1 for no timeout, don't use 0
 };
 
 struct __attribute__((__packed__)) rrs_packet_header {
@@ -91,6 +93,7 @@ struct rrs_ctx {
 	int Status;
 	struct rrs_params Params;
 	struct rrs_buffers Buffers;
+	int FD_Pipe[2];
 
 	ssize_t (*Callback_Read)(size_t len, void *buf, void *userp, size_t timeout_usec);
 	ssize_t (*Callback_Write)(size_t len, void *buf, void *userp);
@@ -118,6 +121,7 @@ extern ssize_t rrs_builtin_callback_read(size_t len, void *buf, void *userp, siz
 extern ssize_t rrs_builtin_callback_write(size_t len, void *buf, void *userp);
 
 extern void rrs_init_ctx(struct rrs_ctx *ctx, struct rrs_params *params);
+extern void rrs_free_ctx(struct rrs_ctx *ctx);
 
 extern ssize_t rrs_write(struct rrs_ctx *ctx, uint16_t len, void *buf);
 extern ssize_t rrs_read(struct rrs_ctx *ctx, uint16_t len, void *buf);
@@ -135,5 +139,13 @@ uint16_t rrs_packet_encode(struct rrs_ctx *ctx, uint16_t packet_type, uint16_t p
 uint16_t rrs_packet_data_decode(struct rrs_ctx *ctx, uint16_t data_len, void *data, void *buf);
 uint16_t rrs_packet_ack_encode(struct rrs_ctx *ctx, uint16_t packet_num);
 uint16_t rrs_packet_nak_encode(struct rrs_ctx *ctx, uint16_t packet_num);
+
+extern uint32_t rrs_u16_combine(uint16_t v0, uint16_t v1);
+extern uint16_t rrs_u16_slice(uint32_t combined, int what);
+
+extern int rrs_pipe_create(struct rrs_ctx *ctx);
+extern void rrs_pipe_do_io(struct rrs_ctx *ctx, int timeout_ms, ssize_t *rc_io, ssize_t *rc_read, ssize_t *rc_write);
+extern void *rrs_pipe_io_thread(void *userp);
+
 
 #endif // Reimu_ReliableStream_H
