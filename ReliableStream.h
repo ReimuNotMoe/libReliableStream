@@ -50,6 +50,9 @@
 #define RRS_PKTYPE_ACK				(UINT16_MAX >> 2)
 #define RRS_PKTYPE_NAK				(UINT16_MAX >> 3)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct rrs_params {
 	uint16_t Length_Checksum;
@@ -96,7 +99,9 @@ struct rrs_ctx {
 	int FD_Pipe[2];
 
 	ssize_t (*Callback_Read)(size_t len, void *buf, void *userp, size_t timeout_usec);
+
 	ssize_t (*Callback_Write)(size_t len, void *buf, void *userp);
+
 	void (*Callback_Checksum)(size_t len, void *buf, void *buf_cksum, void *userp);
 
 	void *CallbackContext_Read;
@@ -112,8 +117,16 @@ struct rrs_builtin_callback_ctx {
 
 };
 
+#ifdef __cplusplus
+}
+#endif
+
 #define rrs_packet_local_increment(ctx)		{(ctx)->Buffers.PacketNum_Local++;if ((ctx)->Buffers.PacketNum_Local == 0)\
 (ctx)->Buffers.PacketNum_Local = 1;}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void rrs_builtin_callback_checksum_crc16(size_t len, void *buf, void *buf_cksum, void *userp);
 
@@ -147,5 +160,8 @@ extern int rrs_pipe_create(struct rrs_ctx *ctx);
 extern void rrs_pipe_do_io(struct rrs_ctx *ctx, int timeout_ms, ssize_t *rc_io, ssize_t *rc_read, ssize_t *rc_write);
 extern void *rrs_pipe_io_thread(void *userp);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // Reimu_ReliableStream_H
