@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 	params.Timeout_IO_Read = 150;
 	params.Timeout_IO_Resend = 300;
 	params.Timeout_IO_Blackhole = 100;
-	params.Timeout_IO_PipeThread = 300;
+	params.Timeout_IO_PipeThread = 30;
 
 	params.LengthMax_Data = 64;
 	params.Length_Checksum = 2;
