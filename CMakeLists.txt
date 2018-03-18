@@ -12,6 +12,7 @@ add_library(ReliableStream SHARED ${SOURCE_FILES} tests/test.c)
 add_library(ReliableStream_Static STATIC ${SOURCE_FILES})
 set_target_properties(ReliableStream_Static PROPERTIES OUTPUT_NAME ReliableStream)
 
+install(TARGETS ReliableStream ReliableStream_Static DESTINATION lib)
 install(FILES ReliableStream.h DESTINATION include/)
 
 add_executable(teest tests/test.c)
